@@ -28,8 +28,17 @@ public class DrawingApp extends JFrame {
     private int freehandPixelsCount = 0;
     private int thickness=10;
     private Color selectedColour = new Color(0.0F, 0.0F, 0.0F);
-    private int remain = MAX_FREEHAND_PIXELS - freehandPixelsCount;
     
+    
+    //line variables
+    private final int MAX_LINE_COUNT = 10;
+    private Color[] lineColour = new Color[MAX_LINE_COUNT];
+    private int[][] lxy = new int[MAX_LINE_COUNT][3];
+    private int lineCount = 0;
+    
+    //rectangle variables
+    
+    //ellipse variables
     
     public void freehand(MouseEvent event,int thickness, Color selectedColour){
         
@@ -38,6 +47,7 @@ public class DrawingApp extends JFrame {
         fxy[freehandPixelsCount][1] = event.getY(); // y-coordinate
         fxy[freehandPixelsCount][2] = thickness; // dimension
         freehandPixelsCount++;
+        messageArea();
         
     }
     
@@ -82,7 +92,20 @@ public class DrawingApp extends JFrame {
         }
     }
     
-    
+    class ClearActionListener implements ActionListener{
+        
+        public void actionPerformed(ActionEvent event){
+            
+            fxy = null;
+            freehandPixelsCount = 0;
+            fxy = new int[MAX_FREEHAND_PIXELS][3];
+            canvas.repaint();
+            messageArea();
+            
+        }
+        
+        
+    }
     
     
     
@@ -108,9 +131,11 @@ public class DrawingApp extends JFrame {
     class radioButtonListener implements ActionListener{
         
         public void actionPerformed(ActionEvent event){
+            messageArea();
             if (Freehand.isSelected()){
                 
                 drawTool="Freehand";
+                
             }
             
         }
@@ -146,7 +171,22 @@ public class DrawingApp extends JFrame {
         }
     }
     
-    public void msg implements JTextArea  
+    public void messageArea(){
+    messageArea.setText(null);
+    switch (drawTool){
+        case "Freehand":
+            if(MAX_FREEHAND_PIXELS>freehandPixelsCount){
+                messageArea.setText(null);
+                messageArea.append("Remaining ink: "+(MAX_FREEHAND_PIXELS - freehandPixelsCount));
+            }
+            break;
+        }
+                
+        
+    }
+        
+    
+     
     
     
     class CheckBoxListener implements ChangeListener{
@@ -316,6 +356,7 @@ public class DrawingApp extends JFrame {
         cpanel.add(aButton);
         ccButton.setPreferredSize(new Dimension(160, 50));
         aButton.setPreferredSize(new Dimension(160, 50));
+        ccButton.addActionListener(new ClearActionListener());
 
         //Menu Bar
         JMenuBar menuBar = new JMenuBar();
@@ -334,7 +375,7 @@ public class DrawingApp extends JFrame {
 
         add(canvas, BorderLayout.CENTER);
         add(cpanel, BorderLayout.LINE_START);
-        add(messagearea, BorderLayout.PAGE_END);
+        add(messageArea, BorderLayout.PAGE_END);
         add(menuBar, BorderLayout.PAGE_START);
 
         
@@ -342,7 +383,7 @@ public class DrawingApp extends JFrame {
         
         
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        
+        messageArea();
         pack();
         setVisible(true);
 
